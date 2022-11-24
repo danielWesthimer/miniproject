@@ -21,14 +21,14 @@ function AppReact() {
     setFolder(dataJson)
   }
 
-  const arrFolder = [
+  const arrFile = [
     { type: "info", obj: { method: 'GET' } },
     { type: "show", obj: { method: 'GET' } },
     { type: "rename", obj: { method: 'PUT' } },
     { type: "copy", obj: { method: 'PUT' } },
     { type: "delete", obj: { method: 'PUT' } }
   ]
-  const arrFile = [
+  const arrFolder = [
     { type: "enter", obj: { method: 'GET' } },
     { type: "show", obj: { method: 'GET' } },
     { type: "rename", obj: { method: 'PUT' } },
@@ -52,12 +52,12 @@ function AppReact() {
               file.isDirectory ?
                 arrFolder.map((e, i) =>
                   <td>
-                    <button onClick={() =>{ e.type==="info"?setSize(file.size): setFiles([]), getData(`http://localhost:8000/${file.fileName}`, e.obj) }}>{e.type}</button>
+                    <button onClick={() => { getData(`http://localhost:8000/${file.fileName}`, e.obj) }}>{e.type}</button>
                   </td>
                 )
                 : arrFile.map((e, i) =>
                   <td>
-                    <button onClick={() => { setFolder([]), setFiles(`http://localhost:8000/${file.fileName}`, e.obj) }}>{e.type}</button>
+                    <button onClick={() => { if (e.type === "info") { setSize(file.size) } else { setFiles([]); setFolder([]); setFiles(`http://localhost:8000/${file.fileName}`, e.obj) } }}>{e.type}</button>
                   </td>
                 )
             }
@@ -67,7 +67,7 @@ function AppReact() {
       <br />
 
     </table>
-    {size&&<div>{size}</div>}
+    {size && <div>{size}</div>}
     {files.length != 0 && <div ><iframe src={files} title="description">{files}</iframe></div>}
     <div>{folder.map((folder) => folder.fileName)}</div>
   </div>)
