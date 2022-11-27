@@ -57,7 +57,12 @@ function AppReact() {
                 )
                 : arrFile.map((e, i) =>
                   <td>
-                    <button onClick={() => { if (e.type === "info") { setSize(file.size) } else { setFiles([]); setFolder([]); setFiles(`http://localhost:8000/${file.fileName}`, e.obj) } }}>{e.type}</button>
+                    <button
+                      onClick={() => {
+                        if (e.type === "info") { setSize(file.size) }
+                        else { setFiles([]); setFolder([]); setFiles(`http://localhost:8000/${file.fileName}`, e.obj) }
+                      }
+                      }>{e.type}</button>
                   </td>
                 )
             }
