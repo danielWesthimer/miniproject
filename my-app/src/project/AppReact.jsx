@@ -1,9 +1,6 @@
-
-
-
 import React from 'react';
 import { useState, useEffect } from 'react';
-// import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 function AppReact() {
 
@@ -11,14 +8,15 @@ function AppReact() {
   const [folder, setFolder] = useState([])
   const [files, setFiles] = useState([])
   const [size, setSize] = useState([])
+  const [up, setUp] = useState()
 
-  useEffect(() => { GetAll() }, [])
+  useEffect(() => { GetAll2("http://localhost:8000") }, [])
 
-  async function GetAll() {
-    const res = await fetch("http://localhost:8000")
-    const dataJson = await res.json()
-    useData(dataJson)
-  }
+  // async function GetAll() {
+  //   const res = await fetch()
+  //   const dataJson = await res.json()
+  //   useData(dataJson)
+  // }
   async function GetAll2(url) {
     const res = await fetch(url)
     const dataJson = await res.json()
@@ -36,14 +34,14 @@ function AppReact() {
     {
       type: "rename", obj: {
         method: 'PUT', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ active: "rename", newName: "poi" })
+        body: JSON.stringify({ active: "rename", newName: "wert" })
       }
     },
 
-    { type: "up", obj: { method: 'PUT' } },
+    
     {
       type: "delete", obj: {
-        method: 'PUT', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        method: 'DELETE', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: "delete", folder: "true" })
       }
     }
@@ -55,16 +53,20 @@ function AppReact() {
     {
       type: "rename", obj: {
         method: 'PUT', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ active: "rename", newName: "yosi.txt" })
+        body: JSON.stringify({ active: "rename", newName: "kk.txt" })
       }
     },
-    { type: "copy", obj: { method: 'PUT' } },
+    
     {
       type: "delete", obj: {
-        method: 'PUT', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        method: 'DELETE', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: "delete", folder: "false" })
       }
-    }
+    },
+    { type: "copy",obj: {
+      method: 'POST', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: "copy" })
+    } },
   ]
 
   return (<div>
@@ -83,9 +85,13 @@ function AppReact() {
               file.isDirectory ?
                 arrFolder.map((e, i) =>
                   <td>
+                  
                     <button onClick={() => {
-                      if (e.type == "enter" ){GetAll2(`http://localhost:8000/${file.fileName}`, e.obj)}
-                     else{ setFiles([]); setSize([]); getData(`http://localhost:8000/${file.fileName}`, e.obj); if (e.type != "enter" && e.type != "show") { GetAll() }
+                     
+                      if (e.type == "enter" ){  setUp(file.path);GetAll2(`http://localhost:8000/${file.path}`, e.obj)}
+                    
+                     else{ setFiles([]); setSize([]); getData(`http://localhost:8000/${file.path}`, e.obj);
+                      if (e.type != "enter" && e.type != "show") { setTimeout(() => {GetAll2(`http://localhost:8000${file.path}../../`) }, 0)  }
                     }}
                     }>{e.type}</button>
                   </td>)
@@ -97,10 +103,9 @@ function AppReact() {
                       setFolder([]); setFiles([]); setSize([]);
                       if (e.type === "info") {  setSize(file) }
                       else if (e.type === "show") {
-                        setFiles(`http://localhost:8000/${file.fileName}`, e.obj)
+                        setFiles(`http://localhost:8000/${file.path}`, e.obj)
                       }
-                      else { getData(`http://localhost:8000/${file.fileName}`, e.obj);setTimeout(() => {GetAll() }, 0)  }
-                        
+                      else { getData(`http://localhost:8000/${file.path}`, e.obj); setTimeout(() => {GetAll2(`http://localhost:8000${file.path}../../`)}, 0);console.log(file.path)  }    
                      
                     }
                     }>{e.type}</button>
@@ -113,6 +118,7 @@ function AppReact() {
       <br />
 
     </table>
+    {up&&<button onClick={()=>{GetAll2(`http://localhost:8000/${up}/../..`) ;setUp(null)}}>up</button>}
     {size.length != 0 && <div>{`name: ${size.fileName} size: ${size.size}Kb  time: ${size.birth}`} </div>}
     {files.length != 0 && <div ><iframe src={files} title="description">{files}</iframe></div>}
     <div>{folder.map((folder) =><p>{ folder.fileName}</p>)}</div>
